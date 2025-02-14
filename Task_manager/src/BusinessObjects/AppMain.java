@@ -53,7 +53,8 @@ public class AppMain
         try
         {
             System.out.println("\nCall findAllSpendingss()");
-            List<Spending> spendings = MySqlSpendingsDao.findAllSpendings();     // call a method in the DAO
+
+            List<Spending> spendings = ISpendingsDao.findAllSpendings();     // call a method in the DAO
 
             if( spendings.isEmpty() )
                 System.out.println("There are no Spendingss");

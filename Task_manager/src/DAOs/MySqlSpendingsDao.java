@@ -71,7 +71,7 @@ public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterfac
             // from the super class (MySqlDao.java)
             connection = this.getConnection();
 
-            String query = "SELECT * FROM USER";
+            String query = "SELECT * FROM SPENDING";
             preparedStatement = connection.prepareStatement(query);
 
             //Using a PreparedStatement to execute SQL...
