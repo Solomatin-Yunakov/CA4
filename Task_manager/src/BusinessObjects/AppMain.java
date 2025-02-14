@@ -1,4 +1,4 @@
-package com.dkit.oop.sd2.BusinessObjects;
+package BusinessObjects;
 
 /** OOP Feb 2022
  * This AppMain demonstrates the use of a Data Access Object (DAO)
@@ -17,16 +17,22 @@ package com.dkit.oop.sd2.BusinessObjects;
  * to create the required MySQL Spendings_database and Spendings table.
  */
 
-import MySqlSpendingsDao;
-import SpendingsDaoInterface;
-import DTOs.Spending;
-import DaoException;
+import DAOs.MySqlSpendingsDao;
+import DAOs.SpendingsDaoInterface;
+import Exceptions.DaoException;
+
+import java.sql.Connection;
 import java.util.List;
+import DAOs.MySqlDao;
+import DTOs.Spending;
 
 public class AppMain
 {
     public static void main(String[] args)
     {
+
+       // MySqlSpendingsDao problem= new MySqlSpendingsDao.getConnection();
+
         SpendingsDaoInterface ISpendingsDao = new MySqlSpendingsDao();  //"ISpendingsDao" -> "I" stands for for
 
 //        // Notice that the SpendingsDao reference is an Interface type.
@@ -47,34 +53,37 @@ public class AppMain
         try
         {
             System.out.println("\nCall findAllSpendingss()");
-            List<Spend> Spendingss = ISpendingsDao.findAllSpendingss();     // call a method in the DAO
+            List<Spending> spendings = MySqlSpendingsDao.findAllSpendings();     // call a method in the DAO
 
-            if( Spendingss.isEmpty() )
+            if( spendings.isEmpty() )
                 System.out.println("There are no Spendingss");
             else {
-                for (Spend Spendings : Spendingss)
+                for (Spending Spendings : spendings)
                     System.out.println("Spendings: " + Spendings.toString());
             }
 
             // test dao - with Spendingsname and password that we know are present in the database
             System.out.println("\nCall: findSpendingsBySpendingsnamePassword()");
-            String Spendingsname = "smithj";
-            String password = "password";
-            Spend Spendings = ISpendingsDao.findSpendingsBySpendingsnamePassword(Spendingsname, password);
+            String date = "";
+            String title = "";
+            String category = "";
+            Double amount = 0.0;
 
-            if( Spendings != null ) // null returned if Spendingsid and password not valid
-                System.out.println("Spendings found: " + Spendings);
+            Spending SpendingsByDate = ISpendingsDao.findAllByDate(date);
+
+            if( SpendingsByDate != null ) // null returned if Spendingsid and password not valid
+                System.out.println("Spendings found: " + SpendingsByDate);
             else
-                System.out.println("Spendingsname with that password not found");
+                System.out.println("Spendingsname with that date not found");
 
             // test dao - with an invalid Spendingsname (i.e. not in database)
-            Spendingsname = "madmax";
-            password = "thunderdome";
-            Spendings = ISpendingsDao.findSpendingsBySpendingsnamePassword(Spendingsname, password);
-            if(Spendings != null)
-                System.out.println("Spendingsname: " + Spendingsname + " was found: " + Spendings);
+            date = "madmax";
+            category = "thunderdome";
+            SpendingsByDate = ISpendingsDao.findAllByDate(date);
+            if(SpendingsByDate != null)
+                System.out.println("Spendingsname: " + date + " was found: " + SpendingsByDate);
             else
-                System.out.println("Spendingsname: " + Spendingsname + ", password: " + password +" is not valid.");
+                System.out.println("Spendingsname: " + date + ", password: " + SpendingsByDate +" is not valid.");
         }
         catch( DaoException e )
         {

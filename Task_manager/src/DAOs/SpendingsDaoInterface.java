@@ -1,4 +1,4 @@
-package com.dkit.oop.sd2.DAOs;
+package DAOs;
 
 /** OOP Feb 2022
  * UserDaoInterface
@@ -25,9 +25,9 @@ import java.util.List;
 
 public interface SpendingsDaoInterface
 {
-    public List<Spend> findAllSpendings() throws DaoException;
+    public List<Spending> findAllSpendings() throws DaoException;
 
-    public Spending findAllByDate(Date date) throws DaoException;
+    public Spending findAllByDate(String date) throws DaoException;
 
 }
 

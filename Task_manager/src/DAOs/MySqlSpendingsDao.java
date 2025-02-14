@@ -1,4 +1,4 @@
-package com.dkit.oop.sd2.DAOs;
+package DAOs;
 
 /** OOP Feb 2024
  *
@@ -19,32 +19,54 @@ package com.dkit.oop.sd2.DAOs;
  */
 
 import DTOs.Spending;
-import DAOs.SpendingsDaoInterface;
+
 import Exceptions.DaoException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import DAOs.MySqlDao;
 
-public class MySqlSpendingsDao extends com.dkit.oop.sd2.DAOs.MySqlDao implements SpendingsDaoInterface
-{
+public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterface {
+    public Connection getConnection() throws DaoException
+    {
+        String driver = "com.mysql.cj.jdbc.Driver";
+        String url = "jdbc:mysql://localhost:3306/user_database";
+        String username = "root";
+        String password = "";
+        Connection connection = null;
+
+        try
+        {
+            Class.forName(driver);
+            connection = DriverManager.getConnection(url, username, password);
+        }
+        catch (ClassNotFoundException e)
+        {
+            System.out.println("Failed to find driver class " + e.getMessage());
+            System.exit(1);
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Connection failed " + e.getMessage());
+            System.exit(2);
+        }
+        return connection;
+    }
     /**
      * Will access and return a List of all users in User database table
+     *
      * @return List of User objects
      * @throws DaoException
      */
     @Override
-    public List<Spend> findAllSpendings() throws DaoException
-    {
+    public List<Spending> findAllSpendings() throws DaoException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        List<Spend> spendList = new ArrayList<>();
+        List<Spending> spendList = new ArrayList<>();
 
-        try
-        {
+        try {
             //Get connection object using the getConnection() method inherited
             // from the super class (MySqlDao.java)
             connection = this.getConnection();
@@ -54,76 +76,67 @@ public class MySqlSpendingsDao extends com.dkit.oop.sd2.DAOs.MySqlDao implements
 
             //Using a PreparedStatement to execute SQL...
             resultSet = preparedStatement.executeQuery();
-            while (resultSet.next())
-            {
+            while (resultSet.next()) {
                 int expenseid = resultSet.getInt("EXPENSE_ID");
                 String title = resultSet.getString("TITLE");
                 String category = resultSet.getString("CATEGORY");
                 double amount = resultSet.getDouble("AMOUNT");
-                Date dateIncurred = resultSet.getDate("DATE");
-                Spend s = new Spend(expenseid, firstname, category, username, password);
-                spendList.add(S);
+                String dateIncurred = resultSet.getString("DATE");
+                Spending s = new Spending(expenseid, title, category, amount, dateIncurred);
+                spendList.add(s);
             }
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw new DaoException("findAllSpendings() " + e.getMessage());
-        } finally
-        {
-            try
-            {
-                if (resultSet != null)
-                {
+        } finally {
+            try {
+                if (resultSet != null) {
                     resultSet.close();
                 }
-                if (preparedStatement != null)
-                {
+                if (preparedStatement != null) {
                     preparedStatement.close();
                 }
-                if (connection != null)
-                {
+                if (connection != null) {
                     freeConnection(connection);
                 }
-            } catch (SQLException e)
-            {
+            } catch (SQLException e) {
                 throw new DaoException("findAllSpending() " + e.getMessage());
             }
         }
         return spendList;     // may be empty
     }
 
-/*/**
+
+
+/*
  * Given a username and password, find the corresponding User
  * @param user_name
  * @param password
  * @return User object if found, or null otherwise
  * @throws DaoException
  */
-    /*@Override
-    public User findUserByUsernamePassword(String user_name, String password) throws DaoException
+
+    public Spending findAllByDate(String date) throws DaoException
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        User user = null;
+        Spending spending = null;
         try
         {
             connection = this.getConnection();
-
-            String query = "SELECT * FROM USER WHERE USERNAME = ? AND PASSWORD = ?";
+            String query = "SELECT * FROM SPENDING WHERE DATE = ? ";
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, user_name);
-            preparedStatement.setString(2, password);
-
+            preparedStatement.setString(1, date);
             resultSet = preparedStatement.executeQuery();
             if (resultSet.next())
             {
                 int expenseid = resultSet.getInt("USER_ID");
-                double amount = resultSet.get("AMOUNT");
-                Date date = resultSet.getDate("Date");
+                double amount = resultSet.getDouble("AMOUNT");
+                String day = resultSet.getString("Date");
                 String category = resultSet.getString("LAST_NAME");
                 String title = resultSet.getString("FIRST_NAME");
 
-                user = new User(expenseid, title, category, amount, date);
+                spending = new Spending(expenseid, title, category, amount, date);
             }
         } catch (SQLException e)
         {
@@ -149,7 +162,7 @@ public class MySqlSpendingsDao extends com.dkit.oop.sd2.DAOs.MySqlDao implements
                 throw new DaoException("findUserByUsernamePassword() " + e.getMessage());
             }
         }
-        return user;     // reference to User object, or null value
+        return spending;     // reference to User object, or null value
     }
 }
 
