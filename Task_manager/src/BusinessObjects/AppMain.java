@@ -86,9 +86,12 @@ public class AppMain
             else
                 System.out.println("Spendingsname: " + date + ", password: " + SpendingsByDate +" is not valid.");
         }
+
         catch( DaoException e )
         {
             e.printStackTrace();
         }
+
+
     }
 }

@@ -28,6 +28,6 @@ public interface SpendingsDaoInterface
     public List<Spending> findAllSpendings() throws DaoException;
 
     public Spending findAllByDate(String date) throws DaoException;
-
+    public double findAllAmount() throws DaoException;
 }
 

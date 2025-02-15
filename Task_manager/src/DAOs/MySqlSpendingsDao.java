@@ -66,6 +66,7 @@ public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterfac
         ResultSet resultSet = null;
         List<Spending> spendList = new ArrayList<>();
 
+
         try {
             //Get connection object using the getConnection() method inherited
             // from the super class (MySqlDao.java)
@@ -132,11 +133,11 @@ public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterfac
             {
                 int expenseid = resultSet.getInt("USER_ID");
                 double amount = resultSet.getDouble("AMOUNT");
-                String day = resultSet.getString("Date");
+                String dateIncurred = resultSet.getString("Date");
                 String category = resultSet.getString("LAST_NAME");
                 String title = resultSet.getString("FIRST_NAME");
 
-                spending = new Spending(expenseid, title, category, amount, date);
+                spending = new Spending(expenseid, title, category, amount, dateIncurred);
             }
         } catch (SQLException e)
         {
@@ -163,6 +164,64 @@ public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterfac
             }
         }
         return spending;     // reference to User object, or null value
+    }
+    public double findAllAmount() throws DaoException
+    {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        Spending spending = null;
+        List<Spending> spendList = new ArrayList<>();
+        double total = 0.0;
+        try
+        {
+
+            connection = this.getConnection();
+            String query = "SELECT SUM(amount) AS total FROM SPENDING ";
+            preparedStatement = connection.prepareStatement(query);
+
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next())
+            {
+                int expenseid = resultSet.getInt("USER_ID");
+                double amount = resultSet.getDouble("AMOUNT");
+                String dateIncurred = resultSet.getString("Date");
+                String category = resultSet.getString("LAST_NAME");
+                String title = resultSet.getString("FIRST_NAME");
+
+                Spending s = new Spending(expenseid, title, category, amount, dateIncurred);
+                spendList.add(s);
+
+                for(Spending s1 : spendList)
+                {
+                    total += s1.getAmount();
+                }
+            }
+        } catch (SQLException e)
+        {
+            throw new DaoException("findUserByUsernamePassword() " + e.getMessage());
+        } finally
+        {
+            try
+            {
+                if (resultSet != null)
+                {
+                    resultSet.close();
+                }
+                if (preparedStatement != null)
+                {
+                    preparedStatement.close();
+                }
+                if (connection != null)
+                {
+                    freeConnection(connection);
+                }
+            } catch (SQLException e)
+            {
+                throw new DaoException("findUserByUsernamePassword() " + e.getMessage());
+            }
+        }
+        return total;     // reference to User object, or null value
     }
 }
 
