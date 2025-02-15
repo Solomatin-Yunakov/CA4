@@ -20,9 +20,9 @@ public class Spending
     private String title;
     private String category;
     private double amount;
-    private Date dateIncurred;
+    private String dateIncurred;
 
-    public Spending(int expensesid, String title, String category, double amount, Date dateIncurred)
+    public Spending(int expensesid, String title, String category, double amount, String dateIncurred)
     {
         this.expensesid = expensesid;
         this.title = title;
@@ -31,7 +31,7 @@ public class Spending
         this.dateIncurred = dateIncurred;
     }
 
-    public Spending( int expensesid, String title, String category, double amount, Date dateIncurred)
+    public Spending(String title, String category, double amount, String dateIncurred)
     {
         this.expensesid = 0;
         this.title = title;
@@ -84,12 +84,12 @@ public class Spending
         this.amount = amount;
     }
 
-    public Date getDateIncurred()
+    public String getDateIncurred()
     {
         return dateIncurred;
     }
 
-    public void setDateIncurred(Date dateIncurred)
+    public void setDateIncurred(String dateIncurred)
     {
         this.dateIncurred = dateIncurred;
     }
