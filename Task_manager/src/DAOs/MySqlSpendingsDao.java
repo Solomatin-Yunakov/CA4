@@ -31,7 +31,7 @@ public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterfac
     public Connection getConnection() throws DaoException
     {
         String driver = "com.mysql.cj.jdbc.Driver";
-        String url = "jdbc:mysql://localhost:3306/user_database";
+        String url = "jdbc:mysql://localhost:3306/CA4";
         String username = "root";
         String password = "";
         Connection connection = null;
