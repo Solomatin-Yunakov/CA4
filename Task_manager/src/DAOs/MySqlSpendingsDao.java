@@ -26,33 +26,29 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import DAOs.MySqlDao;
-
+import java.sql.Date;
+import java.sql.Date;
 public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterface {
-    public Connection getConnection() throws DaoException
-    {
+    public Connection getConnection() throws DaoException {
         String driver = "com.mysql.cj.jdbc.Driver";
         String url = "jdbc:mysql://localhost:3306/CA4";
         String username = "root";
         String password = "";
         Connection connection = null;
 
-        try
-        {
+        try {
             Class.forName(driver);
             connection = DriverManager.getConnection(url, username, password);
-        }
-        catch (ClassNotFoundException e)
-        {
+        } catch (ClassNotFoundException e) {
             System.out.println("Failed to find driver class " + e.getMessage());
             System.exit(1);
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             System.out.println("Connection failed " + e.getMessage());
             System.exit(2);
         }
         return connection;
     }
+
     /**
      * Will access and return a List of all users in User database table
      *
@@ -82,10 +78,15 @@ public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterfac
                 String title = resultSet.getString("TITLE");
                 String category = resultSet.getString("CATEGORY");
                 double amount = resultSet.getDouble("AMOUNT");
-                String dateIncurred = resultSet.getString("DATE");
+                Date dateIncurred = resultSet.getDate("DATE");
                 Spending s = new Spending(expenseid, title, category, amount, dateIncurred);
                 spendList.add(s);
             }
+            double total = 0.0;
+            for (Spending s : spendList) {
+                total = total + s.getAmount();
+            }
+            System.out.println("Total Spendings: " + total);
         } catch (SQLException e) {
             throw new DaoException("findAllSpendings() " + e.getMessage());
         } finally {
@@ -108,120 +109,107 @@ public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterfac
 
 
 
-/*
- * Given a username and password, find the corresponding User
- * @param user_name
- * @param password
- * @return User object if found, or null otherwise
- * @throws DaoException
- */
+    /*
+     * Given a username and password, find the corresponding User
+     * @param user_name
+     * @param password
+     * @return User object if found, or null otherwise
+     * @throws DaoException
+     */
 
-    public Spending findAllByDate(String date) throws DaoException
-    {
+    public Spending findAllByDate(Date date) throws DaoException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
         Spending spending = null;
-        try
-        {
+        try {
             connection = this.getConnection();
             String query = "SELECT * FROM SPENDING WHERE DATE = ? ";
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, date);
+            preparedStatement.setDate(1, date);
             resultSet = preparedStatement.executeQuery();
-            if (resultSet.next())
-            {
-                int expenseid = resultSet.getInt("USER_ID");
+            if (resultSet.next()) {
+                int expenseid = resultSet.getInt("EXPENSE_ID");
                 double amount = resultSet.getDouble("AMOUNT");
-                String dateIncurred = resultSet.getString("Date");
-                String category = resultSet.getString("LAST_NAME");
-                String title = resultSet.getString("FIRST_NAME");
+                Date dateIncurred = resultSet.getDate("Date");
+                String category = resultSet.getString("CATEGORY");
+                String title = resultSet.getString("TITLE");
 
                 spending = new Spending(expenseid, title, category, amount, dateIncurred);
             }
-        } catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw new DaoException("findUserByUsernamePassword() " + e.getMessage());
-        } finally
-        {
-            try
-            {
-                if (resultSet != null)
-                {
+        } finally {
+            try {
+                if (resultSet != null) {
                     resultSet.close();
                 }
-                if (preparedStatement != null)
-                {
+                if (preparedStatement != null) {
                     preparedStatement.close();
                 }
-                if (connection != null)
-                {
+                if (connection != null) {
                     freeConnection(connection);
                 }
-            } catch (SQLException e)
-            {
+            } catch (SQLException e) {
                 throw new DaoException("findUserByUsernamePassword() " + e.getMessage());
             }
         }
         return spending;     // reference to User object, or null value
     }
-    public double findAllAmount() throws DaoException
-    {
+
+    public boolean AddSpending(String title, String category, double amount, Date date) throws DaoException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        Spending spending = null;
-        List<Spending> spendList = new ArrayList<>();
-        double total = 0.0;
-        try
-        {
 
+        try {
             connection = this.getConnection();
-            String query = "SELECT SUM(amount) AS total FROM SPENDING ";
-            preparedStatement = connection.prepareStatement(query);
 
-            resultSet = preparedStatement.executeQuery();
-            if (resultSet.next())
-            {
-                int expenseid = resultSet.getInt("USER_ID");
-                double amount = resultSet.getDouble("AMOUNT");
-                String dateIncurred = resultSet.getString("Date");
-                String category = resultSet.getString("LAST_NAME");
-                String title = resultSet.getString("FIRST_NAME");
-
-                Spending s = new Spending(expenseid, title, category, amount, dateIncurred);
-                spendList.add(s);
-
-                for(Spending s1 : spendList)
-                {
-                    total += s1.getAmount();
-                }
+            // Get the highest EXPENSE_ID to generate a new ID
+            String idQuery = "SELECT MAX(EXPENSE_ID) FROM SPENDING";
+            PreparedStatement idStatement = connection.prepareStatement(idQuery);
+            ResultSet idResult = idStatement.executeQuery();
+            int getid = 1;
+            if (idResult.next()) {
+                getid = idResult.getInt(1) + 1;
             }
-        } catch (SQLException e)
-        {
-            throw new DaoException("findUserByUsernamePassword() " + e.getMessage());
-        } finally
-        {
-            try
-            {
-                if (resultSet != null)
-                {
-                    resultSet.close();
-                }
-                if (preparedStatement != null)
-                {
-                    preparedStatement.close();
-                }
-                if (connection != null)
-                {
-                    freeConnection(connection);
-                }
-            } catch (SQLException e)
-            {
-                throw new DaoException("findUserByUsernamePassword() " + e.getMessage());
-            }
+
+
+            // Corrected SQL insert query
+            String query2 = "INSERT INTO SPENDING (EXPENSE_ID, TITLE, CATEGORY, AMOUNT, DATE) VALUES (?, ?, ?, ?, ?)";
+            preparedStatement = connection.prepareStatement(query2);
+            preparedStatement.setInt(1, getid);
+            preparedStatement.setString(2, title);
+            preparedStatement.setString(3, category);
+            preparedStatement.setDouble(4, amount);
+            preparedStatement.setDate(5, date);
+
+            return preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new DaoException("Failed to add expense: " + e.getMessage());
         }
-        return total;     // reference to User object, or null value
+
+    }
+    public boolean DeleteSpending(int id) throws DaoException {
+
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+
+        try {
+            connection = this.getConnection();  // Initialize connection
+
+            String query = "DELETE FROM SPENDING WHERE EXPENSE_ID = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, id);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            return rowsAffected > 0; // Returns true if at least one row was deleted
+
+        } catch (SQLException e) {
+            throw new DaoException("Error deleting expense with ID " + id + ": " + e.getMessage());
+        }
     }
 }
 

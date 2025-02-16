@@ -25,6 +25,7 @@ import java.sql.Connection;
 import java.util.List;
 import DAOs.MySqlDao;
 import DTOs.Spending;
+import java.sql.Date;
 
 public class AppMain
 {
@@ -65,7 +66,7 @@ public class AppMain
 
             // test dao - with Spendingsname and password that we know are present in the database
             System.out.println("\nCall: findSpendingsBySpendingsnamePassword()");
-            String date = "";
+            Date date = new Date((2004/5/23));
             String title = "";
             String category = "";
             Double amount = 0.0;
@@ -78,13 +79,38 @@ public class AppMain
                 System.out.println("Spendingsname with that date not found");
 
             // test dao - with an invalid Spendingsname (i.e. not in database)
-            date = "madmax";
+            date = new Date((2012/2/4));
             category = "thunderdome";
             SpendingsByDate = ISpendingsDao.findAllByDate(date);
             if(SpendingsByDate != null)
                 System.out.println("Spendingsname: " + date + " was found: " + SpendingsByDate);
             else
                 System.out.println("Spendingsname: " + date + ", password: " + SpendingsByDate +" is not valid.");
+            String titleToAdd="fefef";
+            String categoryToAdd="dfvduumifv";
+            double amountToAdd=344.3;
+            Date dateToAdd=new Date((2004/01/22));
+            boolean addNewSpend = ISpendingsDao.AddSpending(titleToAdd,categoryToAdd,amountToAdd,dateToAdd);     // call a method in the DAO
+
+            if( spendings.isEmpty() )
+                System.out.println("There are no Spendingss");
+            else {
+                for (Spending Spendings : spendings)
+                    System.out.println("Spendings: " + Spendings.toString());
+            }
+            int idtodelete=3;
+            boolean DeleteById = ISpendingsDao.DeleteSpending( idtodelete);     // call a method in the DAO
+
+            if (DeleteById) {
+                System.out.println("Expense deleted successfully.");
+            } else {
+                System.out.println("No expense found with that ID.");
+            }
+
+
+            // test dao - with Spendingsname and password that we know are present in the database
+            System.out.println("\nCall: findSpendingsBySpendingsnamePassword()");
+
         }
 
         catch( DaoException e )

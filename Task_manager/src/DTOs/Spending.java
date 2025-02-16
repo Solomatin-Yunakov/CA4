@@ -1,4 +1,6 @@
 package DTOs;
+import java.sql.Date;
+
 
 /**                                                     OOP Feb 2022
  *  Data Transfer Object (DTO)
@@ -20,9 +22,9 @@ public class Spending
     private String title;
     private String category;
     private double amount;
-    private String dateIncurred;
+    private Date dateIncurred;
 
-    public Spending(int expensesid, String title, String category, double amount, String dateIncurred)
+    public Spending(int expensesid, String title, String category, double amount, Date dateIncurred)
     {
         this.expensesid = expensesid;
         this.title = title;
@@ -31,7 +33,7 @@ public class Spending
         this.dateIncurred = dateIncurred;
     }
 
-    public Spending(String title, String category, double amount, String dateIncurred)
+    public Spending(String title, String category, double amount, Date dateIncurred)
     {
         this.expensesid = 0;
         this.title = title;
@@ -44,7 +46,7 @@ public class Spending
     {
     }
 
-    public int getExpensesid()
+    public int getExpensesidgetExpensesid()
     {
         return expensesid;
     }
@@ -84,12 +86,12 @@ public class Spending
         this.amount = amount;
     }
 
-    public String getDateIncurred()
+    public Date getDateIncurred()
     {
         return dateIncurred;
     }
 
-    public void setDateIncurred(String dateIncurred)
+    public void setDateIncurred(Date dateIncurred)
     {
         this.dateIncurred = dateIncurred;
     }

@@ -22,12 +22,14 @@ package DAOs;
 import DTOs.Spending;
 import Exceptions.DaoException;
 import java.util.List;
+import java.sql.Date;
 
 public interface SpendingsDaoInterface
 {
     public List<Spending> findAllSpendings() throws DaoException;
 
-    public Spending findAllByDate(String date) throws DaoException;
-    public double findAllAmount() throws DaoException;
+    public Spending findAllByDate(Date date) throws DaoException;
+    public boolean AddSpending(String title, String category, double amount, Date date) throws DaoException;
+    public boolean DeleteSpending(int id) throws DaoException;
 }
 
