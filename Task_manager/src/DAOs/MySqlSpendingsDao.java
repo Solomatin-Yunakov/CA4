@@ -18,6 +18,7 @@ package DAOs;
  * in the DAO layer.
  */
 
+import DTOs.Earnings;
 import DTOs.Spending;
 
 import Exceptions.DaoException;
@@ -106,8 +107,57 @@ public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterfac
         }
         return spendList;     // may be empty
     }
+    public double gettotalSpendings() throws DaoException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        List<Earnings> spendList = new ArrayList<>();
 
 
+        try {
+            //Get connection object using the getConnection() method inherited
+            // from the super class (MySqlDao.java)
+            connection = this.getConnection();
+
+            String query = "SELECT * FROM INCOME";
+            preparedStatement = connection.prepareStatement(query);
+
+            //Using a PreparedStatement to execute SQL...
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int incomeid = resultSet.getInt("incomeID");
+                String title = resultSet.getString("TITLE");
+                double amount = resultSet.getDouble("AMOUNT");
+                Date dateIncurred = resultSet.getDate("DATEEARNED");
+                Earnings s = new Earnings(incomeid, title,  amount, dateIncurred);
+                spendList.add(s);
+            }
+            double total = 0.0;
+            for (Earnings s : spendList) {
+                total = total + s.getAmount();
+            }
+
+            System.out.println("Total Earnings: " + total);
+            return total;
+        } catch (SQLException e) {
+            throw new DaoException("findAllEarnings() " + e.getMessage());
+        } finally {
+            try {
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    freeConnection(connection);
+                }
+            } catch (SQLException e) {
+                throw new DaoException("findAllEarnings() " + e.getMessage());
+            }
+        }
+        // may be empty
+    }
 
     /*
      * Given a username and password, find the corresponding User
@@ -116,7 +166,7 @@ public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterfac
      * @return User object if found, or null otherwise
      * @throws DaoException
      */
-
+    @Override
     public Spending findAllByDate(Date date) throws DaoException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -157,6 +207,7 @@ public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterfac
         return spending;     // reference to User object, or null value
     }
 
+    @Override
     public boolean AddSpending(String title, String category, double amount, Date date) throws DaoException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -182,7 +233,7 @@ public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterfac
             preparedStatement.setString(2, title);
             preparedStatement.setString(3, category);
             preparedStatement.setDouble(4, amount);
-            preparedStatement.setDate(5, date);
+            preparedStatement.setDate(5, new java.sql.Date(date.getTime()));
 
             return preparedStatement.executeUpdate() > 0;
 
@@ -191,6 +242,8 @@ public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterfac
         }
 
     }
+
+    @Override
     public boolean DeleteSpending(int id) throws DaoException {
 
         Connection connection = null;
@@ -210,6 +263,59 @@ public  class MySqlSpendingsDao extends MySqlDao implements SpendingsDaoInterfac
         } catch (SQLException e) {
             throw new DaoException("Error deleting expense with ID " + id + ": " + e.getMessage());
         }
-    }
-}
+
+            }
+    public double gettotalEarings() throws DaoException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        List<Earnings> spendList = new ArrayList<>();
+
+
+        try {
+            //Get connection object using the getConnection() method inherited
+            // from the super class (MySqlDao.java)
+            connection = this.getConnection();
+
+            String query = "SELECT * FROM INCOME";
+            preparedStatement = connection.prepareStatement(query);
+
+            //Using a PreparedStatement to execute SQL...
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int incomeid = resultSet.getInt("incomeID");
+                String title = resultSet.getString("TITLE");
+                double amount = resultSet.getDouble("AMOUNT");
+                Date dateIncurred = resultSet.getDate("DATEEARNED");
+                Earnings s = new Earnings(incomeid, title,  amount, dateIncurred);
+                spendList.add(s);
+            }
+            double total = 0.0;
+            for (Earnings s : spendList) {
+                total = total + s.getAmount();
+            }
+
+            System.out.println("Total Earnings: " + total);
+            return total;
+        } catch (SQLException e) {
+            throw new DaoException("findAllEarnings() " + e.getMessage());
+        } finally {
+            try {
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    freeConnection(connection);
+                }
+            } catch (SQLException e) {
+                throw new DaoException("findAllEarnings() " + e.getMessage());
+            }
+        }
+        }
+        }
+
+
 

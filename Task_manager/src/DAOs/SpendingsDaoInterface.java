@@ -31,5 +31,7 @@ public interface SpendingsDaoInterface
     public Spending findAllByDate(Date date) throws DaoException;
     public boolean AddSpending(String title, String category, double amount, Date date) throws DaoException;
     public boolean DeleteSpending(int id) throws DaoException;
+    public double gettotalSpendings() throws DaoException;
+
 }
 
